@@ -1,4 +1,7 @@
 import logging
+import os
+import json
+from io import StringIO
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, ConversationHandler, filters
 import gspread
@@ -7,27 +10,26 @@ from datetime import datetime
 import random
 import re
 
-# تنظیم لاگ‌ها
+# log
 logging.basicConfig(level=logging.INFO)
 
-# مراحل ثبت نام
+# Register
 (NAME, PHONE, NATIONAL_CODE, FIELD, COMPANIONS, CONFIRM) = range(6)
 
-# اتصال به Google Sheets
+# Google Sheets
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "telegramregisterbot.json")
 
+# JSON from env
+SERVICE_ACCOUNT_JSON = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
+credentials_info = json.loads(SERVICE_ACCOUNT_JSON)
+credentials = Credentials.from_service_account_info(credentials_info, scopes=SCOPES)
+
+# connect to GoogleSheet
 SPREADSHEET_ID = '10pusrlu1RfVkqfjqYoW5IatSO09a5vVxIOySOSZ4nLw'
-
-credentials = Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE,
-    scopes=SCOPES
-)
 gc = gspread.authorize(credentials)
-sh = gc.open_by_key(SPREADSHEET_ID)
-worksheet = sh.sheet1
+worksheet = gc.open_by_key(SPREADSHEET_ID).sheet1
 
-# شروع ثبت نام
+# Start :)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("سلام! لطفا نام کامل خود را وارد کنید:")
     return NAME
@@ -128,7 +130,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 if __name__ == '__main__':
-    TOKEN = '7651105829:AAEHLRsPBp7fGB32e0sFwO7d-NcG078Z67c'
+    TOKEN = os.environ['BOT_TOKEN']  #  Railway
 
     app = ApplicationBuilder().token(TOKEN).build()
 
