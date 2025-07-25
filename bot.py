@@ -15,7 +15,8 @@ logging.basicConfig(level=logging.INFO)
 
 # اتصال به Google Sheets
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = r'C:\Users\am2aa\Downloads\telegramregisterbot-ed78306ade37.json'
+SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_APPLICATION_CREDENTIALS", "telegramregisterbot.json")
+
 SPREADSHEET_ID = '10pusrlu1RfVkqfjqYoW5IatSO09a5vVxIOySOSZ4nLw'
 
 credentials = Credentials.from_service_account_file(
